@@ -1,2 +1,2 @@
-# ttb-detection
-table tennis ball detection
+# TTB-detection
+Ping Pong Ball detection
