@@ -1,2 +1,2 @@
-# TTB-detection
+# PPB-detection
 Ping Pong Ball detection
