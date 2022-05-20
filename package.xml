@@ -2,7 +2,7 @@
 <package format="2">
   <name>ppb_ros</name>
   <version>0.0.0</version>
-  <description>The yolov3_trt_ros package</description>
+  <description>ppb_ros package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->

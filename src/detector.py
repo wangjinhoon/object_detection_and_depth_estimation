@@ -57,7 +57,7 @@ from PIL import Image,ImageDraw
 import rospy
 
 from std_msgs.msg import String
-from yolov3_trt_ros.msg import BoundingBox, BoundingBoxes
+from ppb_ros.msg import BoundingBox, BoundingBoxes
 
 from cv_bridge import CvBridge
 from sensor_msgs.msg import Image as Imageros
@@ -65,12 +65,14 @@ from sensor_msgs.msg import Image as Imageros
 from data_processing import PreprocessYOLO, PostprocessYOLO, ALL_CATEGORIES
 import common
 from variables import *
+from estimator import GeometricEstimator
+
 
 TRT_LOGGER = trt.Logger(trt.Logger.WARNING)
 
-CFG = "/home/nvidia/xycar_ws/src/5b/src/yolov3-tiny_tstl_416.cfg"
-TRT = '/home/nvidia/xycar_ws/src/5b/src/model_416_2400_epoch2450.trt'
-NUM_CLASS = 6
+CFG = "/home/nvidia/xycar_ws/src/PPB-detection/src/yolov3-tiny_ppb_416.cfg"
+TRT = '/home/nvidia/xycar_ws/src/PPB-detection/src/model_epoch2650.trt'
+NUM_CLASS = 1
 
 bridge = CvBridge()
 xycar_image = np.empty(shape=[0])
@@ -108,8 +110,12 @@ class yolov3_trt(object):
 
         self.context = self.engine.create_execution_context()
         
+        # self.image_pub = rospy.Publisher('/yolov3_trt_ros/image', Imageros, queue_size=1)
         self.detection_pub = rospy.Publisher('/yolov3_trt_ros/detections', BoundingBoxes, queue_size=1)
-        self.mapx, self.mapy = cv2.initUndistortRectifyMap(CAMERA_METRIX, DIST_COEFFS, None, None, (width, height), cv2.CV_32FC1)
+        self.mapx, self.mapy = cv2.initUndistortRectifyMap(CAMERA_METRIX, DIST_COEFFS, None, None, (640, 480), cv2.CV_32FC1)
+        self.estimator =  GeometricEstimator("trt_driver")
+        self.w_rate = 640.0/416.0
+        self.h_rate = 480.0/416.0
 
     def detect(self):
         rate = rospy.Rate(10)
@@ -126,8 +132,10 @@ class yolov3_trt(object):
                 continue
             
             if self.show_img:
-                cv2.imshow("show_trt",xycar_image)
-                cv2.waitKey(1)
+                show_img = xycar_image.copy()
+                #print(show_img.shape)
+                #cv2.imshow("show_trt",xycar_image)
+                #cv2.waitKey(1)
 
             image = self.preprocessor.process(xycar_image)
             # Store the shape of the original input image in WH format, we will need it for later
@@ -136,6 +144,8 @@ class yolov3_trt(object):
             start_time = time.time()
             inputs[0].host = image
             trt_outputs = common.do_inference(self.context, bindings=bindings, inputs=inputs, outputs=outputs, stream=stream)
+            #print("trt_output:", len(trt_outputs))
+            #print("element shape", trt_outputs[0].shape)
 
             # Before doing post-processing, we need to reshape the outputs as the common.do_inference will give us flat arrays.
             trt_outputs = [output.reshape(shape) for output, shape in zip(trt_outputs, self.output_shapes)]
@@ -154,15 +164,27 @@ class yolov3_trt(object):
                 img_show = np.array(np.transpose(image[0], (1,2,0)) * 255, dtype=np.uint8)
                 obj_detected_img = draw_bboxes(Image.fromarray(img_show), boxes, scores, classes, ALL_CATEGORIES)
                 obj_detected_img_np = np.array(obj_detected_img)    
-                show_img = cv2.cvtColor(obj_detected_img_np, cv2.COLOR_RGB2BGR)
+                #show_img = cv2.cvtColor(obj_detected_img_np, cv2.COLOR_RGB2BGR)
+        
+                if boxes is not None:
+                    for index, box in enumerate(boxes):
+                        #print("box: ", box)
+                        w_rate = 640.0/416.0
+                        h_rate = 480.0/416.0
+                        xmin = int(box[0] * self.w_rate)
+                        ymin = int(box[1] * self.h_rate)
+                        xmax = int((box[0] + box[2]) * self.w_rate)
+                        ymax = int((box[1] + box[3]) * self.h_rate)
+                        
+                        cv2.rectangle(show_img, (xmin, ymin), (xmax, ymax), (0,0,255), 2)
+                        cv2.putText(show_img, str(index), (xmin, ymin), 1, 1, (0,0,0), 2)
+
                 cv2.putText(show_img, "FPS:"+str(int(fps)), (10,50),cv2.FONT_HERSHEY_SIMPLEX, 1,(0,255,0),2,1)
                 cv2.imshow("result",show_img)
                 cv2.waitKey(1)
 
     def _write_message(self, detection_results, boxes, scores, classes):
         """ populate output message with input header and bounding boxes information """
-        # image
-        detection_results.img = xycar_image
 
         if boxes is None:
             return None
@@ -170,10 +192,10 @@ class yolov3_trt(object):
             # Populate darknet message
             minx, miny, width, height = box
             detection_msg = BoundingBox()
-            detection_msg.xmin = int(minx)
-            detection_msg.xmax = int(minx + width) 
-            detection_msg.ymin = int(miny)
-            detection_msg.ymax = int(miny + height)
+            detection_msg.xmin = int(minx * self.w_rate)
+            detection_msg.ymin = int(miny * self.h_rate)
+            detection_msg.xmax = int((minx + width) * self.w_rate)
+            detection_msg.ymax = int((miny + height) * self.h_rate)
             detection_msg.probability = score
             detection_msg.id = int(category)
             detection_results.bounding_boxes.append(detection_msg)
@@ -188,12 +210,16 @@ class yolov3_trt(object):
         """
         detection_results = BoundingBoxes()
         self._write_message(detection_results, boxes, confs, classes)
-        self.detection_pub.publish(detection_results)
+        self.estimator.callback(detection_results)
+        #self.detection_pub.publish(detection_results)
+        #calibrated_image = Imageros()
+        #calibrated_image.data = xycar_image
+        #self.image_pub.publish(CvBridge.cv2_to_imgmsg(calibrated_image, "bgr8"))
 
     def img_callback(self, data):
         global xycar_image
-        xycar_image = bridge.imgmsg_to_cv2(data, "bgr8")
-        xycar_image = cv2.remap(xycar_image, self.mapx, self.mapy, cv2.INTER_LINEAR)
+        img = bridge.imgmsg_to_cv2(data, "bgr8")
+        xycar_image = cv2.remap(img, self.mapx, self.mapy, cv2.INTER_LINEAR)
 
 
 #parse width, height, masks and anchors from cfg file
@@ -232,17 +258,27 @@ def draw_bboxes(image_raw, bboxes, confidences, categories, all_categories, bbox
     """
 
     draw = ImageDraw.Draw(image_raw)
-    if bboxes is None and confidences is None and categories is None:
+    if bboxes is None :
         return image_raw
-    for box, score, category in zip(bboxes, confidences, categories):
-        x_coord, y_coord, width, height = box
-        left = max(0, np.floor(x_coord + 0.5).astype(int))
-        top = max(0, np.floor(y_coord + 0.5).astype(int))
-        right = min(image_raw.width, np.floor(x_coord + width + 0.5).astype(int))
-        bottom = min(image_raw.height, np.floor(y_coord + height + 0.5).astype(int))
+    # for index, box in enumerate(bboxes):
+    #     # x_coord, y_coord, width, height = box
+    #     # left = max(0, np.floor(x_coord + 0.5).astype(int))
+    #     # top = max(0, np.floor(y_coord + 0.5).astype(int))
+    #     # right = min(image_raw.width, np.floor(x_coord + width + 0.5).astype(int))
+    #     # bottom = min(image_raw.height, np.floor(y_coord + height + 0.5).astype(int))
 
-        draw.rectangle(((left, top), (right, bottom)), outline=bbox_color)
-        draw.text((left, top - 12), '{0} {1:.2f}'.format(all_categories[category], score), fill=bbox_color)
+    #     xmin = int(box[0])
+    #     ymin = int(box[1])
+    #     xmax = int(xmin + box[2])
+    #     ymax = int(ymin + box[3])
+    #     width = xmax - xmin
+    #     height = ymax - ymin
+
+    #     cv2.rectangle(image_raw, (xmin, ymin), (xmax, ymax), (0,0,255), 1)
+    #     cv2.putText(image_raw, index, (xmin, ymin), 1, 1, (0,0,0), 2)
+
+    #     # draw.rectangle((xmin, ymin), (xmax, ymax), outline=bbox_color)
+    #     # draw.text((xmin, ymax), '{0}'.format(index), fill=bbox_color)
 
     return image_raw
 

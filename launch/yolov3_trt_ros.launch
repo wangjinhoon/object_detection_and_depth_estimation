@@ -12,8 +12,8 @@
     <param name="io_method" value="mmap"/>
   </node>
 
-  <node name="yolov3_trt_ros" pkg="yolov3_trt_ros" type="detector.py" output="screen" />
-  <node name="trt_driver" pkg="yolov3_trt_ros" type="estimator.py" output="screen" />
+  <node name="yolov3_trt_ros" pkg="ppb_ros" type="detector.py" output="screen" />
+  <node name="trt_driver" pkg="ppb_ros" type="estimator.py" output="screen" />
 
     <!-- motor node -->
   <!-- include file="$(find xycar_motor)/launch/xycar_motor.launch" / -->
