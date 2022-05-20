@@ -1,2 +1,1 @@
-# PPB-detection
-Ping Pong Ball detection
+# yolov3_trt_ros
