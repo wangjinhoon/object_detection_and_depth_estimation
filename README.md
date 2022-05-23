@@ -4,12 +4,6 @@
 <br>
 <br>
 ## 학습
-
----
-
-- **YOLOv3 - tiny** 를 그대로 사용하자
-(파이토치 변환은 시간상 힘들 것 같다)
-    - 학습결과 : <<추가>>
         
 - 영상 **calibration** 값 선택
     - xycar 내부 코드 활용
@@ -46,17 +40,19 @@
 - **데이터 라벨링**
     - 두 탁구공의 색깔을 구분 : white ball, yellow ball
     - ball과 ignore 두 클래스로 구분 :heavy_check_mark:
+
+- **YOLOv3 - tiny** 를 그대로 사용하자
+(파이토치 변환은 시간상 힘들 것 같다)
+    - 학습결과 : 
+    <img src="images/final_4.png" width=600>
         
         
 
-### 객체 위치 판단
+## 객체 위치 판단
 
----
-
-- **거리 추정**
-    - ****Homography Distance Estimation**** ⇒ 추후 적용
-    - ****Geometrical Distance Estimation**** :heavy_check_mark:
-        - 공식 : <<추가필요>>
+### 거리 추정
+   - ****Homography Distance Estimation**** ⇒ 추후 적용
+   - ****Geometrical Distance Estimation**** :heavy_check_mark:
         - 카메라와 대상 객체의 기하학적 조건을 활용
             - 카메라 높이
             - 대상 객체가 3차원 공간에 존재하는 특수 조건
@@ -68,7 +64,6 @@
             - 체크보드 20 + 10장
                 - FOVx: 84.42658489293875
                 - FOVy: 68.51253227818162
-            - 코드 실제사용 설명이 추가로 필요
        - <img src="https://render.githubusercontent.com/render/math?math=\text{azimuth}, \text{distance}_x, \text{distance}_z"> 계산 <br>
             - <img src="https://render.githubusercontent.com/render/math?math=\text{Camera Height} = 0.1475"> <br>
             - <img src="https://render.githubusercontent.com/render/math?math=\text{FOV}_h = \frac{135.4 - 42}{2}"> <br>
@@ -83,19 +78,21 @@
             <img src="https://render.githubusercontent.com/render/math?math=\text{distance}_z = (\frac{\text{Camera Height}}{y_{\text{Normalized Plane}}} \times 100)"> <br>
             <img src="https://render.githubusercontent.com/render/math?math=\text{distance}_x = \distance_z \times \tan(\frac{\text{azimuth}}{180}\pi)"> <br>
             <img src="https://render.githubusercontent.com/render/math?math=\text{distance} = \distance_z / \cos(\frac{\text{azimuth}}{180}\pi)"> <br>
-- 딥러닝 결과 640x480 → 416x416 바뀜
-    - 정확한 거리 측정을 위해 바운딩 박스를 다시 640x480에 맞춰줌
+### 영상 변환
+   - 딥러닝 결과 640x480 → 416x416 바뀜
+   - 정확한 거리 측정을 위해 바운딩 박스를 다시 640x480에 맞춰줌
         - 640/416 , 480/416 곱하기 :heavy_check_mark:
             
             <img src="images/self_code1.png" width=300>
             
-- **2D 객체 위치 그리기**
-    - 버드아이뷰
-    - matplot
-    - rivz
-    - OpenCV :heavy_check_mark:
+### 2D 객체 위치 그리기
 
-        <img src="images/self_code2.png" width=300>
+   - 버드아이뷰
+   - matplot
+   - rivz
+   - OpenCV :heavy_check_mark:
+
+       <img src="images/self_code2.png" width=300>
         
 - Sensor Fusion ( USB cam + ? )
     - Lidar : 높이가 높아서 바닥의 탁구공을 검출하지 못함
@@ -105,9 +102,9 @@
     ⇒ 추후에 적용 해보기로 했음  
 <br>
 <br>
+
 ## 결과 확인
 
----
 <img src="images/final_1.png" width=400>
 <img src="images/final_2.png" width=400>
 <img src="images/final_3.png" width=700>  
