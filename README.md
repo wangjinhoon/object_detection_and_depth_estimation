@@ -109,8 +109,6 @@
 <img src="images/final_2.png" width=400>
 <img src="images/final_3.png" width=700>
 
-![KakaoTalk_20220523_151934072](https://user-images.githubusercontent.com/83506637/169755978-37af99f0-9b74-4bac-9abf-0584d786bbd2.gif)
-
 ## 설명  
 - 탁구공 객체를 인식해서 빨간색 바운딩 박스와 인덱스 표시
 - OpenCV로 2D맵 구현
