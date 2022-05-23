@@ -69,6 +69,18 @@
                 - FOVx: 84.42658489293875
                 - FOVy: 68.51253227818162
             - 코드 실제사용 설명이 추가로 필요
+       - <img src="https://render.githubusercontent.com/render/math?math=\text{azimuth}, \text{distance}_x, \text{distance}_z"> 계산 <br>
+            - Get a center pixel value in x axis <br>
+            <img src="https://render.githubusercontent.com/render/math?math=x_{\text{center}} = \frac{x_{\min} %2B x_{\max}}{2} "> <br>
+            - Get a y coordinate in normalized image plane <br>
+            <img src="https://render.githubusercontent.com/render/math?math=y_{\text{Normalized Plane}}=\frac{y_{max} - f_y}{o_y}"> <br>
+            <br>
+            <img src="https://render.githubusercontent.com/render/math?math=\Delta x_{\text{pixel}} = (x_{\text{pixel center}} - \frac{\text{width}}{2})"> <br>
+            <img src="https://render.githubusercontent.com/render/math?math=\text{azimuth} = (\Delta x / \frac{\text{width}}{2}) \times FOV_h"> <br>
+            
+            <img src="https://render.githubusercontent.com/render/math?math=\text{distance}_z = (\frac{\text{Camera height}}{y_{\text{Normalized Plane}}} \times 100)"> <br>
+            <img src="https://render.githubusercontent.com/render/math?math=\text{distance}_x = \distance_z \times \tan(\frac{\text{azimuth}}{180}\pi)"> <br>
+            <img src="https://render.githubusercontent.com/render/math?math=\text{distance} = \distance_z \times \cos(\frac{\text{azimuth}}{180}\pi)"> <br>
 - 딥러닝 결과 640x480 → 416x416 바뀜
     - 정확한 거리 측정을 위해 바운딩 박스를 다시 640x480에 맞춰줌
         - 640/416 , 480/416 곱하기 :heavy_check_mark:
