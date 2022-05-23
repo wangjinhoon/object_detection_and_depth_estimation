@@ -105,12 +105,43 @@
 
 ## 결과 확인
 
-<img src="images/final_1.png" width=400>
+<img src="images/final_1.png" width=700>
 <img src="images/final_2.png" width=400>
-<img src="images/final_3.png" width=700>
+<img src="images/final_3.png" width=400>  
+<img height=500 src="https://user-images.githubusercontent.com/36834513/169756319-7e91da99-e1c8-4eba-83a7-3fd67eb1aa85.gif">  
 
-## 설명  
-- 탁구공 객체를 인식해서 빨간색 바운딩 박스와 인덱스 표시
-- OpenCV로 2D맵 구현
-    - mask의 하단 중앙(하얀점)을 0,0으로 두고 상대좌표를 표시
-    - 따라서 출력되는 값은 (dx, dz, d)
+
+- 제출 방식
+
+    **[거리정보 정확도 확인]**
+    
+    - 최상원 멘토님이 준비해주신 이미지에서 확인할 수 있는 세 가지 객체(탁구공)의 x,y 거리 좌표 csv 파일
+    
+    **[객체 인식 정확도 확인]**
+    
+    - 추후 첨부된 score 파일에 작성된 (README.txt) 파일을 참조하여 객체인식 csv 결과 파일을 포맷에 맞춰 제출
+
+
+## 탁구공 객체 인식 결과
+
+기본 상태
+
+<img src="images/1-1.png" width=200>   
+<img src="images/1-2.png" width=200>   
+<img src="images/1-3.png" width=200>   
+<img src="images/1-4.png" width=200>   
+
+시간상 빠르게 인식률을 높이기 위해 confidence만 낮춘 상태  
+
+<img src="images/2-1.png" width=200>   
+<img src="images/2-2.png" width=200>   
+<img src="images/2-3.png" width=200>   
+<img src="images/2-4.png" width=200>   
+
+
+## 등수 결과
+
+<img src="images/result.png" width=800>   
+
+
+인식등수 **5등**, 거리등수 **2등 👏👏**
