@@ -126,16 +126,16 @@
 
 기본 상태
 
-<img src="images/1-1.png" width=200>   
-<img src="images/1-2.png" width=200>   
-<img src="images/1-3.png" width=200>   
+<span><img src="images/1-1.png" width=200></span>
+<span><img src="images/1-2.png" width=200></span>
+<span><img src="images/1-3.png" width=200></span>
 <img src="images/1-4.png" width=200>   
 
 시간상 빠르게 인식률을 높이기 위해 confidence만 낮춘 상태  
 
-<img src="images/2-1.png" width=200>   
-<img src="images/2-2.png" width=200>   
-<img src="images/2-3.png" width=200>   
+<span><img src="images/2-1.png" width=200></span>
+<span><img src="images/2-2.png" width=200></span>
+<span><img src="images/2-3.png" width=200></span>
 <img src="images/2-4.png" width=200>   
 
 
