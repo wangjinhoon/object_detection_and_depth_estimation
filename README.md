@@ -9,6 +9,7 @@
 
 - **YOLOv3 - tiny** 를 그대로 사용하자
 (파이토치 변환은 시간상 힘들 것 같다)
+    - 학습결과 : <<추가>>
         
 - 영상 **calibration** 값 선택
     - xycar 내부 코드 활용
@@ -55,6 +56,7 @@
 - **거리 추정**
     - ****Homography Distance Estimation**** ⇒ 추후 적용
     - ****Geometrical Distance Estimation**** :heavy_check_mark:
+        - 공식 : <<추가필요>>
         - 카메라와 대상 객체의 기하학적 조건을 활용
             - 카메라 높이
             - 대상 객체가 3차원 공간에 존재하는 특수 조건
