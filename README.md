@@ -156,4 +156,4 @@
 
 인식등수 **5등**, 거리등수 **2등 👏👏**  
 
-[자세한 내용 Notion 링크](https://tasteful-dianella-4f4.notion.site/170517dcc27f436fa3526b33958010be)
+[자세한 내용 Notion 링크](https://tasteful-dianella-4f4.notion.site/8e43aebe16914b008fa4a1882110bf34)
